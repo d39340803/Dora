@@ -584,7 +584,7 @@
 
         function generateEmbedCode(vid) {
             const currentOrigin = window.location.origin;
-            const embedCode = `<div style="width:100%;overflow:hidden;"><iframe allow="autoplay; encrypted-media" src="${currentOrigin}/Dora-/?v=${vid}&ap=1&vol=100" style="display:block;width:100.5%;height:75px;border:none;margin-left:-0.25%;"
+            const embedCode = `<div style="width:100%;overflow:hidden;"><iframe allow="autoplay; encrypted-media" src="${currentOrigin}/Dora/?v=${vid}&ap=1&vol=100" style="display:block;width:100.5%;height:75px;border:none;margin-left:-0.25%;"
 ></iframe></div>`;
 
             document.getElementById('embedCodeOutput').value = embedCode;
@@ -857,27 +857,32 @@
             player.seekTo(seekTarget, true);
             document.getElementById('progressBarFill').style.width = `${clickPosition * 100}%`;
         });
-                // Ad-blocking network interceptor for GitHub Pages hosting
+        // Enhanced Ad-blocking Network Interceptor for GitHub Pages
         (function() {
             if (!window.fetch) return;
             
             const adDomains = [
                 'doubleclick.net',
                 'googleads',
+                'googlesyndication.com',
                 'ytimg.com/an_webp',
                 'youtube.com/get_video_info',
-                'youtube.com/api/stats/ads'
+                'youtube.com/api/stats/ads',
+                's.ytimg.com/yts/jsbin/player',
+                'api/v1/player/ad_monetization'
             ];
 
+            // Intercept fetch requests
             const originalFetch = window.fetch;
             window.fetch = async function(...args) {
                 const url = args[0] ? args[0].toString() : '';
                 if (adDomains.some(domain => url.includes(domain))) {
-                    return new Promise(() => {}); 
+                    return new Promise(() => {}); // Block ad payload
                 }
                 return originalFetch.apply(this, args);
             };
 
+            // Intercept XHR ad tracking and insertion calls
             const originalOpen = XMLHttpRequest.prototype.open;
             XMLHttpRequest.prototype.open = function(method, url, ...rest) {
                 if (url && adDomains.some(domain => url.toString().includes(domain))) {
@@ -886,6 +891,7 @@
                 return originalOpen.apply(this, arguments);
             };
         })();
+
 
     </script>
 </body>
