@@ -525,7 +525,6 @@
                 videoId = newId;
                 document.getElementById('ytInput').value = '';
                 generateEmbedCode(newId);
-                // Completely tear down and recreate player to simulate fresh 1st load session & dodge ads
                 initPlayer(newId, 1);
             } else {
                 showAlert('Please enter a valid YouTube link or 11-character Video ID.');
@@ -629,17 +628,22 @@
                         }
 
                         if (brightness > 20 && brightness < 240) {
-                            if (brightness < 80) {
-                                let factor = 130 / (brightness || 1);
-                                tr = Math.min(255, Math.floor(tr * factor));
-                                tg = Math.min(255, Math.floor(tg * factor));
-                                tb = Math.min(255, Math.floor(tb * factor));
-                            }
                             colors.push({ r: tr, g: tg, b: tb });
                         }
                     }
 
+                    // Brighten and boost ONLY --c1 for maximum UI accent vividness
                     let c1 = `rgb(${brightestColor.r}, ${brightestColor.g}, ${brightestColor.b})`;
+                    let brightestBrightness = (brightestColor.r * 299 + brightestColor.g * 587 + brightestColor.b * 114) / 1000;
+                    if (brightestBrightness < 90) {
+                        let factor = 140 / (brightestBrightness || 1);
+                        let br = Math.min(255, Math.floor(brightestColor.r * factor));
+                        let bg = Math.min(255, Math.floor(brightestColor.g * factor));
+                        let bb = Math.min(255, Math.floor(brightestColor.b * factor));
+                        c1 = `rgb(${br}, ${bg}, ${bb})`;
+                    }
+
+                    // --c2, --c3, --c4, and --c5 use raw natural thumbnail colors without brightening boosts
                     let c5 = `rgb(${colors[Math.floor(colors.length/4)]?.r || 26}, ${colors[Math.floor(colors.length/4)]?.g || 26}, ${colors[Math.floor(colors.length/4)]?.b || 26})`;
                     let c2 = `rgb(${colors[Math.floor(colors.length/3)]?.r || 40}, ${colors[Math.floor(colors.length/3)]?.g || 20}, ${colors[Math.floor(colors.length/3)]?.b || 60})`;
                     let c3 = `rgb(${colors[Math.floor(colors.length/1.5)]?.r || 100}, ${colors[Math.floor(colors.length/1.5)]?.g || 30}, ${colors[Math.floor(colors.length/1.5)]?.b || 200})`;
@@ -655,7 +659,7 @@
                     document.documentElement.style.setProperty('--c3', c3);
                     document.documentElement.style.setProperty('--c4', c4);
                 } catch (e) {
-                    console.log("Using default accent color due to CORS restrictions.");
+                    console.log("Using default gradient due to CORS restrictions.");
                 }
             };
         }
@@ -663,7 +667,6 @@
         function initPlayer(vid, autoPlayState) {
             updateThumbnailAndTheme(vid);
 
-            // Completely destroy previous player instance container to reset session & block ads on song changes
             const oldTarget = document.getElementById('youtube-player');
             if (oldTarget) oldTarget.remove();
 
