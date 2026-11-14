@@ -481,46 +481,6 @@
     <div id="youtube-player"></div>
 
     <script>
-        // Incognito / Cookie-Blocking Environment Emulator
-(function() {
-    try {
-        // Block localStorage access
-        Object.defineProperty(window, 'localStorage', {
-            value: {
-                getItem: () => null,
-                setItem: () => {},
-                removeItem: () => {},
-                clear: () => {},
-                length: 0,
-                key: () => null
-            },
-            writable: false
-        });
-
-        // Block sessionStorage access
-        Object.defineProperty(window, 'sessionStorage', {
-            value: {
-                getItem: () => null,
-                setItem: () => {},
-                removeItem: () => {},
-                clear: () => {},
-                length: 0,
-                key: () => null
-            },
-            writable: false
-        });
-
-        // Neutralize document.cookie getter/setter
-        Object.defineProperty(document, 'cookie', {
-            get: function() { return ''; },
-            set: function() { return true; },
-            configurable: false
-        });
-    } catch (e) {
-        console.log("Storage sandbox initialized.");
-    }
-})();
-
         // Custom Alert Box Function
         function showAlert(message) {
             document.getElementById('customAlertMessage').innerText = message;
@@ -857,42 +817,6 @@
             player.seekTo(seekTarget, true);
             document.getElementById('progressBarFill').style.width = `${clickPosition * 100}%`;
         });
-        // Enhanced Ad-blocking Network Interceptor for GitHub Pages
-        (function() {
-            if (!window.fetch) return;
-            
-            const adDomains = [
-                'doubleclick.net',
-                'googleads',
-                'googlesyndication.com',
-                'ytimg.com/an_webp',
-                'youtube.com/get_video_info',
-                'youtube.com/api/stats/ads',
-                's.ytimg.com/yts/jsbin/player',
-                'api/v1/player/ad_monetization'
-            ];
-
-            // Intercept fetch requests
-            const originalFetch = window.fetch;
-            window.fetch = async function(...args) {
-                const url = args[0] ? args[0].toString() : '';
-                if (adDomains.some(domain => url.includes(domain))) {
-                    return new Promise(() => {}); // Block ad payload
-                }
-                return originalFetch.apply(this, args);
-            };
-
-            // Intercept XHR ad tracking and insertion calls
-            const originalOpen = XMLHttpRequest.prototype.open;
-            XMLHttpRequest.prototype.open = function(method, url, ...rest) {
-                if (url && adDomains.some(domain => url.toString().includes(domain))) {
-                    arguments[1] = 'data:text/plain;charset=utf-8,%7B%7D';
-                }
-                return originalOpen.apply(this, arguments);
-            };
-        })();
-
-
     </script>
 </body>
 </html>
