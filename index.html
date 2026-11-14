@@ -481,6 +481,46 @@
     <div id="youtube-player"></div>
 
     <script>
+        // Incognito / Cookie-Blocking Environment Emulator
+(function() {
+    try {
+        // Block localStorage access
+        Object.defineProperty(window, 'localStorage', {
+            value: {
+                getItem: () => null,
+                setItem: () => {},
+                removeItem: () => {},
+                clear: () => {},
+                length: 0,
+                key: () => null
+            },
+            writable: false
+        });
+
+        // Block sessionStorage access
+        Object.defineProperty(window, 'sessionStorage', {
+            value: {
+                getItem: () => null,
+                setItem: () => {},
+                removeItem: () => {},
+                clear: () => {},
+                length: 0,
+                key: () => null
+            },
+            writable: false
+        });
+
+        // Neutralize document.cookie getter/setter
+        Object.defineProperty(document, 'cookie', {
+            get: function() { return ''; },
+            set: function() { return true; },
+            configurable: false
+        });
+    } catch (e) {
+        console.log("Storage sandbox initialized.");
+    }
+})();
+
         // Custom Alert Box Function
         function showAlert(message) {
             document.getElementById('customAlertMessage').innerText = message;
@@ -544,7 +584,7 @@
 
         function generateEmbedCode(vid) {
             const currentOrigin = window.location.origin;
-            const embedCode = `<div style="width:100%;overflow:hidden;"><iframe allow="autoplay; encrypted-media" src="${currentOrigin}/Dora/?v=${vid}&ap=1&vol=100" style="display:block;width:100.5%;height:75px;border:none;margin-left:-0.25%;"
+            const embedCode = `<div style="width:100%;overflow:hidden;"><iframe allow="autoplay; encrypted-media" src="${currentOrigin}/Dora-/?v=${vid}&ap=1&vol=100" style="display:block;width:100.5%;height:75px;border:none;margin-left:-0.25%;"
 ></iframe></div>`;
 
             document.getElementById('embedCodeOutput').value = embedCode;
@@ -817,39 +857,35 @@
             player.seekTo(seekTarget, true);
             document.getElementById('progressBarFill').style.width = `${clickPosition * 100}%`;
         });
-        // Ad-blocking network interceptor for GitHub Pages hosting
-(function() {
-    if (!window.fetch) return;
-    
-    const adDomains = [
-        'doubleclick.net',
-        'googleads',
-        'ytimg.com/an_webp',
-        'youtube.com/get_video_info',
-        'youtube.com/api/stats/ads'
-    ];
+                // Ad-blocking network interceptor for GitHub Pages hosting
+        (function() {
+            if (!window.fetch) return;
+            
+            const adDomains = [
+                'doubleclick.net',
+                'googleads',
+                'ytimg.com/an_webp',
+                'youtube.com/get_video_info',
+                'youtube.com/api/stats/ads'
+            ];
 
-    // Intercept fetch requests
-    const originalFetch = window.fetch;
-    window.fetch = async function(...args) {
-        const url = args[0] ? args[0].toString() : '';
-        if (adDomains.some(domain => url.includes(domain))) {
-            // Silently block ad telemetry and ad media requests
-            return new Promise(() => {}); 
-        }
-        return originalFetch.apply(this, args);
-    };
+            const originalFetch = window.fetch;
+            window.fetch = async function(...args) {
+                const url = args[0] ? args[0].toString() : '';
+                if (adDomains.some(domain => url.includes(domain))) {
+                    return new Promise(() => {}); 
+                }
+                return originalFetch.apply(this, args);
+            };
 
-    // Intercept XHR script requests used by YouTube iframe API for ads
-    const originalOpen = XMLHttpRequest.prototype.open;
-    XMLHttpRequest.prototype.open = function(method, url, ...rest) {
-        if (url && adDomains.some(domain => url.toString().includes(domain))) {
-            // Redirect ad requests to a harmless local abort route
-            arguments[1] = 'data:text/plain;charset=utf-8,%7B%7D';
-        }
-        return originalOpen.apply(this, arguments);
-    };
-})();
+            const originalOpen = XMLHttpRequest.prototype.open;
+            XMLHttpRequest.prototype.open = function(method, url, ...rest) {
+                if (url && adDomains.some(domain => url.toString().includes(domain))) {
+                    arguments[1] = 'data:text/plain;charset=utf-8,%7B%7D';
+                }
+                return originalOpen.apply(this, arguments);
+            };
+        })();
 
     </script>
 </body>
