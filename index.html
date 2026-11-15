@@ -38,6 +38,7 @@
             background: linear-gradient(135deg, var(--c5, #1a1a1a), var(--c2, #0f0f0f), var(--c3, #2a1b3d), var(--c4, #111));
             background-size: 300% 300%;
             animation: gradientAnimation 12s ease infinite;
+            animation-play-state: paused; /* Paused by default until playing */
             
             border-radius: 0px;
             overflow: hidden;
@@ -48,6 +49,10 @@
             height: 75px;
             flex-shrink: 0;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .player-wrapper.playing {
+            animation-play-state: running;
         }
 
         .player-main {
@@ -232,7 +237,7 @@
             box-shadow: 0 0 10px var(--c1), 0 0 4px var(--c1);
         }
 
-        /* Input & Embed Section Container */
+        /* Input & Actions Container */
         .content-container {
             display: none;
             flex-direction: column;
@@ -276,73 +281,147 @@
             font-weight: 500;
             cursor: pointer;
             transition: opacity 0.2s;
+            white-space: nowrap;
         }
 
         .input-group button:hover {
             opacity: 0.85;
         }
 
-        /* Embed Code Section */
-        .embed-section {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            background: #141414;
-            border: 1px solid #222;
-            padding: 12px;
-            border-radius: 6px;
-        }
-
-        .embed-label {
-            font-size: 11px;
-            font-weight: 600;
-            color: #aaa;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .embed-row {
+        .action-row {
             display: flex;
             gap: 8px;
         }
 
-        .embed-row textarea {
-            flex-grow: 1;
-            background: #0a0a0a;
-            border: 1px solid #282828;
-            border-radius: 4px;
-            padding: 8px;
-            color: #00ffcc;
-            font-family: monospace;
-            font-size: 11px;
-            height: 65px;
-            resize: none;
-            outline: none;
-        }
-
-        .embed-row button {
-            background: #222;
+        .action-row button {
+            background: #1f1f1f;
             color: #fff;
-            border: 1px solid #444;
-            border-radius: 4px;
-            padding: 0 14px;
+            border: 1px solid #333;
+            border-radius: 6px;
+            padding: 8px 14px;
             font-size: 12px;
-            font-weight: 500;
             cursor: pointer;
             transition: background 0.2s, border-color 0.2s;
-            white-space: nowrap;
         }
 
-        .embed-row button:hover {
-            background: #333;
+        .action-row button:hover {
+            background: #2a2a2a;
             border-color: var(--c1, #ff3385);
         }
 
-        /* Custom Alert Box Overlay Styling */
+        /* History Section */
+        .history-section {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .history-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .clear-history-btn {
+            background: none;
+            border: none;
+            color: #ff4444;
+            font-size: 11px;
+            cursor: pointer;
+            padding: 2px 4px;
+            transition: opacity 0.2s;
+        }
+
+        .clear-history-btn:hover {
+            opacity: 0.8;
+            text-decoration: underline;
+        }
+
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .history-item {
+            background: #141414;
+            border: 1px solid #222;
+            padding: 8px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #ddd;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.2s, border-color 0.2s, color 0.2s;
+        }
+
+        .history-item:hover {
+            background: #1f1f1f;
+            border-color: var(--c1, #ff3385);
+            color: #fff;
+        }
+
+        .history-title-text {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            flex-grow: 1;
+            margin-right: 8px;
+        }
+
+        .history-remove-btn {
+            background: none;
+            border: none;
+            color: #777;
+            font-size: 14px;
+            cursor: pointer;
+            padding: 0 4px;
+            line-height: 1;
+            transition: color 0.2s;
+        }
+
+        .history-remove-btn:hover {
+            color: #ff4444;
+        }
+
+        /* See All / See Less Link Style Button */
+        .history-toggle-btn {
+            background: none;
+            border: none;
+            color: var(--c1, #ff3385);
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: left;
+            padding: 2px 0;
+            margin-top: 2px;
+            width: fit-content;
+            transition: opacity 0.2s;
+        }
+
+        .history-toggle-btn:hover {
+            opacity: 0.8;
+            text-decoration: underline;
+        }
+
+        /* Custom Alert / Embed Modal Overlay Styling */
         #customAlertOverlay {
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(0, 0, 0, 0.75);
             backdrop-filter: blur(5px);
             display: none;
             align-items: center;
@@ -357,7 +436,7 @@
             border-radius: 12px;
             padding: 20px;
             width: 100%;
-            max-width: 320px;
+            max-width: 400px;
             text-align: center;
             box-shadow: 0 10px 30px rgba(0,0,0,0.8), 0 0 15px var(--c1, #ff3385);
             animation: alertPop 0.2s ease-out;
@@ -380,9 +459,30 @@
         .custom-alert-message {
             font-size: 13px;
             color: #ddd;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             line-height: 1.4;
             word-break: break-word;
+        }
+
+        .custom-alert-textarea {
+            width: 100%;
+            background: #0a0a0a;
+            border: 1px solid #282828;
+            border-radius: 4px;
+            padding: 8px;
+            color: #00ffcc;
+            font-family: monospace;
+            font-size: 11px;
+            height: 65px;
+            resize: none;
+            outline: none;
+            margin-bottom: 16px;
+        }
+
+        .custom-alert-btn-group {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
         }
 
         .custom-alert-btn {
@@ -398,6 +498,11 @@
             box-shadow: 0 0 8px var(--c1, #ff3385);
         }
 
+        .custom-alert-btn.secondary {
+            background: #222;
+            box-shadow: none;
+        }
+
         .custom-alert-btn:hover {
             opacity: 0.85;
         }
@@ -405,12 +510,15 @@
 </head>
 <body>
 
-    <!-- Custom Alert Overlay -->
+    <!-- Custom Alert / Modal Overlay -->
     <div id="customAlertOverlay">
         <div class="custom-alert-box">
-            <div class="custom-alert-title">Notice</div>
+            <div id="modalTitle" class="custom-alert-title">Notice</div>
             <div id="customAlertMessage" class="custom-alert-message">Message here</div>
-            <button id="customAlertOkBtn" class="custom-alert-btn">OK</button>
+            <div id="modalExtraContainer"></div>
+            <div class="custom-alert-btn-group">
+                <button id="customAlertOkBtn" class="custom-alert-btn">OK</button>
+            </div>
         </div>
     </div>
 
@@ -457,19 +565,24 @@
         </div>
     </div>
 
-    <!-- Input Field & Embed Section (Only visible when NO video ID is in the URL) -->
+    <!-- Input Field & Live History Section -->
     <div id="contentContainer" class="content-container">
         <div class="input-group">
             <input type="text" id="ytInput" placeholder="Paste YouTube link or Video ID...">
             <button id="loadBtn">Play</button>
         </div>
+        
+        <div class="action-row">
+            <button id="embedModalBtn">Get Embed Code</button>
+        </div>
 
-        <div id="embedSection" class="embed-section" style="display: none;">
-            <div class="embed-label">Embed Code</div>
-            <div class="embed-row">
-                <textarea id="embedCodeOutput" readonly></textarea>
-                <button id="copyBtn">Copy</button>
+        <div class="history-section" id="historySection" style="display: none;">
+            <div class="history-header">
+                <div class="history-label">Recently Played History</div>
+                <button class="clear-history-btn" id="clearHistoryBtn">Clear history</button>
             </div>
+            <div class="history-list" id="historyList"></div>
+            <button class="history-toggle-btn" id="historyToggleBtn" style="display: none;" onclick="toggleHistoryExpansion()">See all</button>
         </div>
     </div>
 
@@ -477,14 +590,48 @@
     <div id="playerContainerHost"></div>
 
     <script>
-        function showAlert(message) {
+        // Custom Alert & Modal Functions
+        function showAlert(title, message, isEmbed = false, embedText = '') {
+            document.getElementById('modalTitle').innerText = title;
             document.getElementById('customAlertMessage').innerText = message;
-            document.getElementById('customAlertOverlay').style.display = 'flex';
-        }
+            const extraContainer = document.getElementById('modalExtraContainer');
+            const btnGroup = document.querySelector('.custom-alert-btn-group');
+            extraContainer.innerHTML = '';
 
-        document.getElementById('customAlertOkBtn').addEventListener('click', () => {
-            document.getElementById('customAlertOverlay').style.display = 'none';
-        });
+            if (isEmbed) {
+                const textarea = document.createElement('textarea');
+                textarea.className = 'custom-alert-textarea';
+                textarea.value = embedText;
+                textarea.readOnly = true;
+                extraContainer.appendChild(textarea);
+
+                btnGroup.innerHTML = `
+                    <button id="modalCopyBtn" class="custom-alert-btn">Copy Code</button>
+                    <button id="customAlertOkBtn" class="custom-alert-btn secondary">Close</button>
+                `;
+
+                document.getElementById('modalCopyBtn').addEventListener('click', () => {
+                    textarea.select();
+                    textarea.setSelectionRange(0, 99999);
+                    try {
+                        navigator.clipboard.writeText(textarea.value).then(() => {
+                            const copyBtn = document.getElementById('modalCopyBtn');
+                            copyBtn.innerText = 'Copied!';
+                            setTimeout(() => copyBtn.innerText = 'Copy Code', 2000);
+                        });
+                    } catch (err) {
+                        document.execCommand('copy');
+                    }
+                });
+            } else {
+                btnGroup.innerHTML = `<button id="customAlertOkBtn" class="custom-alert-btn">OK</button>`;
+            }
+
+            document.getElementById('customAlertOverlay').style.display = 'flex';
+            document.getElementById('customAlertOkBtn').addEventListener('click', () => {
+                document.getElementById('customAlertOverlay').style.display = 'none';
+            }, { once: true });
+        }
 
         const urlParams = new URLSearchParams(window.location.search);
         let videoId = urlParams.get('v');
@@ -496,6 +643,101 @@
         let isPlaying = false;
         let isLooping = false;
         let progressInterval;
+        let currentTitle = '';
+        let isHistoryExpanded = false;
+
+        // LocalStorage History Management (Limit 100 tracks)
+        function getHistory() {
+            try {
+                return JSON.parse(localStorage.getItem('dora_music_history') || '[]');
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function saveHistory(vid, title) {
+            let history = getHistory().filter(item => item.vid !== vid);
+            history.unshift({ vid, title: title || `Track (${vid})` });
+            if (history.length > 100) history = history.slice(0, 100);
+            try {
+                localStorage.setItem('dora_music_history', JSON.stringify(history));
+            } catch (e) {}
+            renderHistoryUI();
+        }
+
+        function removeHistoryItem(vid, event) {
+            event.stopPropagation(); // Prevent triggering the track click
+            let history = getHistory().filter(item => item.vid !== vid);
+            try {
+                localStorage.setItem('dora_music_history', JSON.stringify(history));
+            } catch (e) {}
+            renderHistoryUI();
+        }
+
+        document.getElementById('clearHistoryBtn').addEventListener('click', () => {
+            try {
+                localStorage.removeItem('dora_music_history');
+            } catch (e) {}
+            isHistoryExpanded = false;
+            renderHistoryUI();
+        });
+
+        function toggleHistoryExpansion() {
+            isHistoryExpanded = !isHistoryExpanded;
+            renderHistoryUI();
+        }
+
+        function renderHistoryUI() {
+            const history = getHistory();
+            const section = document.getElementById('historySection');
+            const list = document.getElementById('historyList');
+            const toggleBtn = document.getElementById('historyToggleBtn');
+            list.innerHTML = '';
+
+            if (history.length > 0) {
+                section.style.display = 'flex';
+
+                // Determine display count based on expansion state
+                const displayLimit = isHistoryExpanded ? history.length : 4;
+                const visibleHistory = history.slice(0, displayLimit);
+
+                visibleHistory.forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = 'history-item';
+                    
+                    const spanTitle = document.createElement('span');
+                    spanTitle.className = 'history-title-text';
+                    spanTitle.innerText = item.title;
+                    spanTitle.title = item.title;
+
+                    const removeBtn = document.createElement('button');
+                    removeBtn.className = 'history-remove-btn';
+                    removeBtn.innerHTML = '&times;';
+                    removeBtn.title = 'Remove from history';
+                    removeBtn.addEventListener('click', (e) => removeHistoryItem(item.vid, e));
+
+                    div.appendChild(spanTitle);
+                    div.appendChild(removeBtn);
+
+                    div.addEventListener('click', () => {
+                        videoId = item.vid;
+                        initPlayer(item.vid, 1);
+                    });
+                    list.appendChild(div);
+                });
+
+                // Show 'See all' / 'See less' button only if there are more than 4 items
+                if (history.length > 4) {
+                    toggleBtn.style.display = 'block';
+                    toggleBtn.innerText = isHistoryExpanded ? 'See less' : 'See all';
+                } else {
+                    toggleBtn.style.display = 'none';
+                }
+            } else {
+                section.style.display = 'none';
+                isHistoryExpanded = false;
+            }
+        }
 
         function extractVideoId(input) {
             input = input.trim();
@@ -511,11 +753,19 @@
             document.getElementById('contentContainer').style.display = 'flex';
             setTrackTitle('Enter a song below');
             document.getElementById('trackTimeDisplay').innerText = 'Idle';
+            renderHistoryUI();
         }
 
         document.getElementById('loadBtn').addEventListener('click', handleUserSubmit);
         document.getElementById('ytInput').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') handleUserSubmit();
+        });
+
+        document.getElementById('embedModalBtn').addEventListener('click', () => {
+            const currentOrigin = window.location.origin;
+            const activeVid = videoId || 'dQw4w9WgXcQ';
+            const embedCode = `<div style="width:100%;overflow:hidden;"><iframe allow="autoplay; encrypted-media" src="${currentOrigin}/Dora/?v=${activeVid}&ap=1&vol=100" style="display:block;width:100.5%;height:75px;border:none;margin-left:-0.25%;"></iframe></div>`;
+            showAlert('Embed Code', 'Copy the code snippet below to embed this music player seamlessly into your project.', true, embedCode);
         });
 
         function handleUserSubmit() {
@@ -524,75 +774,23 @@
             if (newId) {
                 videoId = newId;
                 document.getElementById('ytInput').value = '';
-                generateEmbedCode(newId);
                 initPlayer(newId, 1);
             } else {
-                showAlert('Please enter a valid YouTube link or 11-character Video ID.');
+                showAlert('Notice', 'Please enter a valid YouTube link or 11-character Video ID.');
             }
-        }
-
-        function generateEmbedCode(vid) {
-            const currentOrigin = window.location.origin;
-            const embedCode = `<div style="width:100%;overflow:hidden;"><iframe allow="autoplay; encrypted-media" src="${currentOrigin}/Dora/?v=${vid}&ap=1&vol=100" style="display:block;width:100.5%;height:75px;border:none;margin-left:-0.25%;"
-></iframe></div>`;
-
-            document.getElementById('embedCodeOutput').value = embedCode;
-            document.getElementById('embedSection').style.display = 'flex';
-        }
-
-        document.getElementById('copyBtn').addEventListener('click', () => {
-            const textarea = document.getElementById('embedCodeOutput');
-            textarea.select();
-            textarea.setSelectionRange(0, 99999);
-
-            try {
-                if (navigator.clipboard && navigator.clipboard.writeText) {
-                    navigator.clipboard.writeText(textarea.value).then(() => {
-                        showCopySuccess();
-                    }).catch(() => {
-                        fallbackCopy(textarea);
-                    });
-                } else {
-                    fallbackCopy(textarea);
-                }
-            } catch (err) {
-                fallbackCopy(textarea);
-            }
-        });
-
-        function fallbackCopy(textarea) {
-            try {
-                const successful = document.execCommand('copy');
-                if (successful) {
-                    showCopySuccess();
-                } else {
-                    showAlert('Failed to copy. Please select and copy manually.');
-                }
-            } catch (err) {
-                showAlert('Failed to copy. Please select and copy manually.');
-            }
-        }
-
-        function showCopySuccess() {
-            const btn = document.getElementById('copyBtn');
-            const originalText = btn.innerText;
-            btn.innerText = 'Copied!';
-            btn.style.background = 'var(--c1, #ff3385)';
-            btn.style.color = '#fff';
-            setTimeout(() => {
-                btn.innerText = originalText;
-                btn.style.background = '#222';
-                btn.style.color = '#fff';
-            }, 2000);
         }
 
         function setTrackTitle(text, url = '#') {
+            currentTitle = text;
             const t1 = document.getElementById('ytAnchorTitle1');
             const t2 = document.getElementById('ytAnchorTitle2');
             t1.innerText = text;
             t2.innerText = text;
             t1.href = url;
             t2.href = url;
+            if (videoId) {
+                saveHistory(videoId, text);
+            }
         }
 
         function updateThumbnailAndTheme(vid) {
@@ -632,7 +830,7 @@
                         }
                     }
 
-                    // Brighten and boost ONLY --c1 for maximum UI accent vividness
+                    // Brighten and boost ONLY --c1
                     let c1 = `rgb(${brightestColor.r}, ${brightestColor.g}, ${brightestColor.b})`;
                     let brightestBrightness = (brightestColor.r * 299 + brightestColor.g * 587 + brightestColor.b * 114) / 1000;
                     if (brightestBrightness < 90) {
@@ -643,11 +841,24 @@
                         c1 = `rgb(${br}, ${bg}, ${bb})`;
                     }
 
-                    // --c2, --c3, --c4, and --c5 use raw natural thumbnail colors without brightening boosts
-                    let c5 = `rgb(${colors[Math.floor(colors.length/4)]?.r || 26}, ${colors[Math.floor(colors.length/4)]?.g || 26}, ${colors[Math.floor(colors.length/4)]?.b || 26})`;
-                    let c2 = `rgb(${colors[Math.floor(colors.length/3)]?.r || 40}, ${colors[Math.floor(colors.length/3)]?.g || 20}, ${colors[Math.floor(colors.length/3)]?.b || 60})`;
-                    let c3 = `rgb(${colors[Math.floor(colors.length/1.5)]?.r || 100}, ${colors[Math.floor(colors.length/1.5)]?.g || 30}, ${colors[Math.floor(colors.length/1.5)]?.b || 200})`;
-                    let c4 = `rgb(${colors[colors.length-1]?.r || 20}, ${colors[colors.length-1]?.g || 20}, ${colors[colors.length-1]?.b || 30})`;
+                    // Check if palette is flat/identical across samples; if so, create structured darkening/shadow offset tiers instead of flat brightening
+                    let baseR = brightestColor.r, baseG = brightestColor.g, baseB = brightestColor.b;
+                    let sampleCheck = colors.slice(0, 5);
+                    let isFlatPalette = sampleCheck.every(col => Math.abs(col.r - baseR) < 15 && Math.abs(col.g - baseG) < 15 && Math.abs(col.b - baseB) < 15);
+
+                    let c2, c3, c4, c5;
+                    if (isFlatPalette) {
+                        // Automatically generate deep progressive shadow/darkness contrasts for rich depth
+                        c2 = `rgb(${Math.max(0, baseR - 30)}, ${Math.max(0, baseG - 30)}, ${Math.max(0, baseB - 30)})`;
+                        c3 = `rgb(${Math.max(0, baseR - 60)}, ${Math.max(0, baseG - 60)}, ${Math.max(0, baseB - 60)})`;
+                        c4 = `rgb(${Math.max(0, baseR - 90)}, ${Math.max(0, baseG - 90)}, ${Math.max(0, baseB - 90)})`;
+                        c5 = `rgb(${Math.max(0, baseR - 120)}, ${Math.max(0, baseG - 120)}, ${Math.max(0, baseB - 120)})`;
+                    } else {
+                        c2 = colors[Math.floor(colors.length/3)] ? `rgb(${colors[Math.floor(colors.length/3)].r}, ${colors[Math.floor(colors.length/3)].g}, ${colors[Math.floor(colors.length/3)].b})` : `rgb(${Math.max(0, baseR-40)}, ${Math.max(0, baseG-40)}, ${Math.max(0, baseB-40)})`;
+                        c3 = colors[Math.floor(colors.length/1.5)] ? `rgb(${colors[Math.floor(colors.length/1.5)].r}, ${colors[Math.floor(colors.length/1.5)].g}, ${colors[Math.floor(colors.length/1.5)].b})` : `rgb(${Math.min(255, baseR+30)}, ${Math.min(255, baseG+10)}, ${Math.min(255, baseB+50)})`;
+                        c4 = colors[colors.length-1] ? `rgb(${colors[colors.length-1].r}, ${colors[colors.length-1].g}, ${colors[colors.length-1].b})` : `rgb(${Math.max(0, baseR-70)}, ${Math.max(0, baseG-70)}, ${Math.max(0, baseB-70)})`;
+                        c5 = colors[Math.floor(colors.length/4)] ? `rgb(${colors[Math.floor(colors.length/4)].r}, ${colors[Math.floor(colors.length/4)].g}, ${colors[Math.floor(colors.length/4)].b})` : `rgb(20, 20, 25)`;
+                    }
 
                     if (customColor) {
                         c1 = '#' + customColor;
@@ -733,22 +944,26 @@
         function onPlayerStateChange(event) {
             const playIcon = document.getElementById('playIcon');
             const pauseIcon = document.getElementById('pauseIcon');
+            const playerWrapper = document.getElementById('playerWrapper');
 
             if (event.data === YT.PlayerState.PLAYING) {
                 isPlaying = true;
                 playIcon.style.display = 'none';
                 pauseIcon.style.display = 'block';
+                playerWrapper.classList.add('playing');
                 startProgressTracker();
                 updateTrackMetadata();
             } else if (event.data === YT.PlayerState.PAUSED) {
                 isPlaying = false;
                 playIcon.style.display = 'block';
                 pauseIcon.style.display = 'none';
+                playerWrapper.classList.remove('playing');
                 stopProgressTracker();
             } else if (event.data === YT.PlayerState.ENDED) {
                 isPlaying = false;
                 playIcon.style.display = 'block';
                 pauseIcon.style.display = 'none';
+                playerWrapper.classList.remove('playing');
                 stopProgressTracker();
                 
                 if (isLooping) {
